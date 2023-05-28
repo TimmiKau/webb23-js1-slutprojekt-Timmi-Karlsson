@@ -52,7 +52,7 @@
           'userInputSearchCity'
         ).value
         //Url call to convert cityname to coordinates
-        const cordinatesApiUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${userInputSearchCity}&limit=5&appid=${apiKey}`
+        const cordinatesApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${userInputSearchCity}&limit=5&appid=${apiKey}`
 
         fetch(cordinatesApiUrl)
           .then((response) => {
