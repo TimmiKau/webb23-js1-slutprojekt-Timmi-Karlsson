@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <form
+      action=""
+      id="searchPlace"
+      onsubmit="event.preventDefault(); callLocationToLatLon()"
+    >
+      <input
+        type="text"
+        id="userInputSearchCity"
+        placeholder="Country, City or place"
+      />
+
+      <select name="interval" id="intervalSelect" size="">
+        <option value="39">Full</option>
+        <option value="2">3h</option>
+        <option value="3">6h</option>
+        <option value="4">9h</option>
+      </select>
+      <input type="submit" value="Search" />
+    </form>
+
+    <div id="weather"></div>
+
+    <script>
+      //My api key
+      const apiKey = '8c290fd559fab5640b999e58f664b55c'
+
+      //Global data info
+      let data = 0
+
+      //User input hours
+      let userInputHours = 39
+
+      //add event listener for userInputHours
+      const intervalSelect = document.getElementById('intervalSelect')
+      intervalSelect.addEventListener('change', function () {
+        userInputHours = parseInt(this.value)
+        console.log(userInputHours)
+      })
+
+      function callLocationToLatLon() {
+        const userInputSearchCity = document.getElementById(
+          'userInputSearchCity'
+        ).value
+        //Url call to convert cityname to coordinates
+        const cordinatesApiUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${userInputSearchCity}&limit=5&appid=${apiKey}`
+
+        fetch(cordinatesApiUrl)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                'Error: ' + response.status + ' ' + response.statusText
+              )
+            }
+            return response.json()
+          })
+          .then((data) => {
+            //console.log(data[0].lat, data[0].lon)
+            ConvertToCoordinates(data[0].lat, data[0].lon)
+          })
+          .catch((error) => {
+            alert('An error occurred - Cant find location')
+          })
+      }
+
+      function ConvertToCoordinates(lat, lon) {
+        //Url for weather in lat & lon, output in metric
+        const weatherApiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+
+        fetch(weatherApiUrl)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                'Error: ' + response.status + ' ' + response.statusText
+              )
+            }
+            return response.json()
+          })
+          .then((fetchedData) => {
+            data = fetchedData
+            console.log(data)
+            extra()
+          })
+          .catch((error) => {
+            alert('An error occurred - Cant show location')
+          })
+      }
+
+      function extra() {
+        //Get the div
+        const weatherDiv = document.getElementById('weather')
+        //Clean weatherDiv
+        weatherDiv.innerHTML = ''
+
+        //Create topbar for weather info
+        const cityName = document.createElement('h1')
+        const gridSpace = document.createElement('div')
+        const temp = document.createElement('h1')
+        const wind = document.createElement('h1')
+
+        //Add content topbar
+        cityName.innerText = data.city.name
+        temp.innerText = 'Temp'
+        wind.innerText = 'Wind'
+
+        //add elements to top bar div
+        weatherDiv.appendChild(cityName)
+        weatherDiv.appendChild(gridSpace)
+        weatherDiv.appendChild(temp)
+        weatherDiv.appendChild(wind)
+
+        for (let i = 0; i < userInputHours; i++) {
+          //Create element
+          const dateTime = document.createElement('h2')
+          const weatherSymbol = document.createElement('img')
+          const tempLoop = document.createElement('h2')
+          const windLoop = document.createElement('h2')
+
+          //Content
+          dateTime.innerText = data.list[i].dt_txt
+          weatherSymbol.src = `https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png`
+          tempLoop.innerText = data.list[i].main.temp + '°C'
+          windLoop.innerText = data.list[i].wind.speed + 'm/s'
+
+          //append to div
+          weatherDiv.appendChild(dateTime)
+          weatherDiv.appendChild(weatherSymbol)
+          weatherDiv.appendChild(tempLoop)
+          weatherDiv.appendChild(windLoop)
+
+          if (data.list[i].main.temp < 15) {
+            tempLoop.style.color = 'Blue'
+          } else if (
+            data.list[i].main.temp <= 15 &&
+            data.list[i].main.temp <= 20
+          ) {
+            tempLoop.style.color = 'Black'
+          } else if (data.list[i].main.temp > 20) {
+            tempLoop.style.color = 'Red'
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
