@@ -11,7 +11,7 @@
     <form
       action=""
       id="searchPlace"
-      onsubmit="event.preventDefault(); callLocationToLatLon()"
+      onsubmit="event.preventDefault(); callLocation()"
     >
       <input
         type="text"
@@ -20,7 +20,7 @@
       />
 
       <select name="interval" id="intervalSelect" size="">
-        <option value="39">Full</option>
+        <option value="39">Max</option>
         <option value="2">3h</option>
         <option value="3">6h</option>
         <option value="4">9h</option>
@@ -34,24 +34,23 @@
       //My api key
       const apiKey = '8c290fd559fab5640b999e58f664b55c'
 
-      //Global data info
+      //Data from api for all functions
       let data = 0
 
-      //User input hours
+      //User input hours (default 39, max amount of input from api)
       let userInputHours = 39
 
       //add event listener for userInputHours
       const intervalSelect = document.getElementById('intervalSelect')
       intervalSelect.addEventListener('change', function () {
         userInputHours = parseInt(this.value)
-        console.log(userInputHours)
       })
 
-      function callLocationToLatLon() {
+      function callLocation() {
         const userInputSearchCity = document.getElementById(
           'userInputSearchCity'
         ).value
-        //Url call to convert cityname to coordinates
+        //Url call to convert city name to coordinates
         const cordinatesApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${userInputSearchCity}&limit=5&appid=${apiKey}`
 
         fetch(cordinatesApiUrl)
@@ -64,7 +63,6 @@
             return response.json()
           })
           .then((data) => {
-            //console.log(data[0].lat, data[0].lon)
             ConvertToCoordinates(data[0].lat, data[0].lon)
           })
           .catch((error) => {
@@ -86,17 +84,17 @@
             return response.json()
           })
           .then((fetchedData) => {
+            //To add this to global variable
             data = fetchedData
-            console.log(data)
-            extra()
+            displayInfo()
           })
           .catch((error) => {
             alert('An error occurred - Cant show location')
           })
       }
 
-      function extra() {
-        //Get the div
+      function displayInfo() {
+        //Get the div in html
         const weatherDiv = document.getElementById('weather')
         //Clean weatherDiv
         weatherDiv.innerHTML = ''
@@ -125,18 +123,19 @@
           const tempLoop = document.createElement('h2')
           const windLoop = document.createElement('h2')
 
-          //Content
+          //Content (weatherInfo)
           dateTime.innerText = data.list[i].dt_txt
           weatherSymbol.src = `https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png`
           tempLoop.innerText = data.list[i].main.temp + '°C'
           windLoop.innerText = data.list[i].wind.speed + 'm/s'
 
-          //append to div
+          //append to weatherDiv
           weatherDiv.appendChild(dateTime)
           weatherDiv.appendChild(weatherSymbol)
           weatherDiv.appendChild(tempLoop)
           weatherDiv.appendChild(windLoop)
 
+          //Change color of temperature text biased on temperatures
           if (data.list[i].main.temp < 15) {
             tempLoop.style.color = 'Blue'
           } else if (
