@@ -1,10 +1,10 @@
- //My api key
+ //My api key from  Openweathermap.org
  const apiKey = '8c290fd559fab5640b999e58f664b55c'
 
- //Data from api for all functions
+ //GlobalData from api for all functions
  let data = 0
 
- //User input hours (default 40, max amount of input from api)
+ //User input hours (default 40, the max amount of input from api)
  let userInputHours = 40
 
  //add event listener for userInputHours
@@ -13,7 +13,8 @@
    userInputHours = parseInt(this.value)
  })
 
- function callLocation() {
+ //function return location in lat , lon
+ function convertCityNameToLatLon() {
    const userInputSearchCity = document.getElementById(
      'userInputSearchCity'
    ).value
@@ -30,14 +31,15 @@
        return response.json()
      })
      .then((data) => {
-       ConvertToCoordinates(data[0].lat, data[0].lon)
+       callLocationFromApi(data[0].lat, data[0].lon)
      })
      .catch((error) => {
        alert('An error occurred - Cant find location')
      })
  }
 
- function ConvertToCoordinates(lat, lon) {
+//Function return weather information from api.
+ function callLocationFromApi(lat, lon) {
    //Url for weather in lat & lon, output in metric
    const weatherApiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
 
@@ -61,63 +63,64 @@
  }
 
  function displayInfo() {
-   //Get the div in html
+   //Get the div from html
    const weatherDiv = document.getElementById('weather')
    //Clean weatherDiv
    weatherDiv.innerHTML = ''
 
-   //Create topbar for weather info
+   //Create topBar for weather info
    const cityName = document.createElement('h1')
    const description = document.createElement('h1')
    const gridSpace = document.createElement('div')
-   const temp = document.createElement('h1')
-   const wind = document.createElement('h1')
+   const tempText = document.createElement('h1')
+   const windText = document.createElement('h1')
 
-   //Add content topbar
+   //Add content topBar
    cityName.innerText = data.city.name
    description.innerText = 'Description'
-   temp.innerText = 'Temp'
-   wind.innerText = 'Wind'
+   tempText.innerText = 'Temp'
+   windText.innerText = 'Wind'
 
-   //add elements to top bar div
+   //append to topBar
    weatherDiv.appendChild(cityName)
    weatherDiv.appendChild(description)
    weatherDiv.appendChild(gridSpace)
-   weatherDiv.appendChild(temp)
-   weatherDiv.appendChild(wind)
+   weatherDiv.appendChild(tempText)
+   weatherDiv.appendChild(windText)
 
+   //ForLoop display all the weatherInfo
    for (let i = 0; i < userInputHours; i++) {
      //Create element
      const dateTime = document.createElement('h2')
      const descriptionInfo = document.createElement('h2')
      const weatherSymbol = document.createElement('img')
-     const tempLoop = document.createElement('h2')
-     const windLoop = document.createElement('h2')
+     const temp = document.createElement('h2')
+     const wind = document.createElement('h2')
 
      //Content (weatherInfo)
      dateTime.innerText = data.list[i].dt_txt
      descriptionInfo.innerText = data.list[i].weather[0].description
      weatherSymbol.src = `https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png`
-     tempLoop.innerText = data.list[i].main.temp + '°C'
-     windLoop.innerText = data.list[i].wind.speed + 'm/s'
+     temp.innerText = data.list[i].main.temp + '°C'
+     wind.innerText = data.list[i].wind.speed + 'm/s'
 
      //append to weatherDiv
      weatherDiv.appendChild(dateTime)
      weatherDiv.appendChild(descriptionInfo)
      weatherDiv.appendChild(weatherSymbol)
-     weatherDiv.appendChild(tempLoop)
-     weatherDiv.appendChild(windLoop)
+     weatherDiv.appendChild(temp)
+     weatherDiv.appendChild(wind)
 
      //Change color of temperature text biased on temperatures
      if (data.list[i].main.temp < 15) {
-       tempLoop.style.color = 'Blue'
+       temp.style.color = 'Blue'
      } else if (
        data.list[i].main.temp <= 15 &&
        data.list[i].main.temp <= 20
      ) {
-       tempLoop.style.color = 'Black'
+       temp.style.color = 'Black'
      } else if (data.list[i].main.temp > 20) {
-       tempLoop.style.color = 'Red'
+       temp.style.color = 'Red'
      }
    }
  }
