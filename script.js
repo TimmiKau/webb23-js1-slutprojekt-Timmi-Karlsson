@@ -13,30 +13,36 @@
    userInputHours = parseInt(this.value)
  })
 
- //function return location in lat , lon
- function convertCityNameToLatLon() {
-   const userInputSearchCity = document.getElementById(
-     'userInputSearchCity'
-   ).value
-   //Url call to convert city name to coordinates
-   const cordinatesApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${userInputSearchCity}&limit=5&appid=${apiKey}`
+// function to convert city name to coordinates
+function convertCityNameToLatLon() {
+  const userInputSearchCity = document.getElementById('userInputSearchCity').value;
+  const coordinatesApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${userInputSearchCity}&limit=5&appid=${apiKey}`;
 
-   fetch(cordinatesApiUrl)
-     .then((response) => {
-       if (!response.ok) {
-         throw new Error(
-           'Error: ' + response.status + ' ' + response.statusText
-         )
-       }
-       return response.json()
-     })
-     .then((data) => {
-       callLocationFromApi(data[0].lat, data[0].lon)
-     })
-     .catch((error) => {
-       alert('An error occurred - Cant find location')
-     })
- }
+  fetch(coordinatesApiUrl)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(
+          'Error: ' + response.status + ' ' + response.statusText
+        );
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data.length > 0) {
+        callLocationFromApi(data[0].lat, data[0].lon);
+      } else {
+        throw new Error('No location found for the given city.');
+      }
+    })
+    .catch((error) => {
+      if (error.message.includes('TypeError')) {
+        alert('Input a valid location.');
+      } else {
+        alert('Something went wrong. Please try again later.');
+      }
+    });
+}
+
 
 //Function return weather information from api.
  function callLocationFromApi(lat, lon) {
