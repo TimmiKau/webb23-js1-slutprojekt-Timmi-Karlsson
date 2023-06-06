@@ -35,7 +35,7 @@ function convertCityNameToLatLon() {
       }
     })
     .catch((error) => {
-      if (error.message.includes('TypeError')) {
+      if (error.message === ) {
         alert('Input a valid location.');
       } else {
         alert('Something went wrong. Please try again later.');
