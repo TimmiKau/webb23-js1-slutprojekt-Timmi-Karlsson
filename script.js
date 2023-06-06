@@ -35,13 +35,16 @@ function convertCityNameToLatLon() {
       }
     })
     .catch((error) => {
-      if (error.message === '[] ') {
+      if (error.message.includes('TypeError')) {
+        alert('Input a valid location.');
+      } else if (error.message === 'No location found for the given city.') {
         alert('Input a valid location.');
       } else {
         alert('Something went wrong. Please try again later.');
       }
     });
 }
+
 
 
 //Function return weather information from api.
